@@ -1,14 +1,3 @@
-/* global firebase moment */
-// Steps to complete:
-// 1. Initialize Firebase
-// 2. Create button for adding new trains - then update the html + update the database
-// 3. Create a way to retrieve trains from the train database.
-// 4. Create a way to calculate the months worked. Using difference between time and current time.
-//    Then use moment.js formatting to set difference in months.
-// 5. Calculate Total billed
-// 1. Initialize Firebase
-
-
 // Initialize Firebase
 var config = {
     apiKey: "AIzaSyBT-YKaepYVYB0gXq2WF6encDhQQsasYC4",
@@ -70,15 +59,13 @@ function populateList() {
         console.log('user = ' + loggedUser);
         // console.log('userId = ' + loggedUser.uid);
         console.log('trainUser = ' + trainUser);
-
+        // adding a row in the html 
         if ((loggedUser == null) || (trainUser == loggedUser.uid)) {
             $("#train-table > tbody").prepend("<tr><td>" + trainName + "</td><td>" + trainDest + "</td><td>" +
                 trainFreq + "</td><td>" + arrivalTime + "</td><td>" + minArrival + "</td>");
         };
     });
 };
-
-// populateList();
 
 // Authentication
 
@@ -155,14 +142,16 @@ $(document).on("submit", '#train-submit', function(event) {
     event.preventDefault();
     console.log('form');
 
-//     // Grabs user input
+    // Grabs user input
     var trainName = $("#name-input").val().trim();
     var trainDest = $("#dest-input").val().trim();
     
     var trainFreq = $("#freq-input").val().trim();
     var trainTime = $("#time-input").val().trim();
+
     console.log('time = ', trainTime);
     var trainTimemom = moment(trainTime, "HH:mm");
+
     // save the user's id so we can match users to trains,
     var trainUser = firebase.auth().currentUser.uid;
 
@@ -187,13 +176,13 @@ $(document).on("submit", '#train-submit', function(event) {
         };
         // Uploads train data to the database
         database.ref().push(newTrain);
-        // var x = Object.key();
-        // database.ref(x).name = "pippo";
+
         // Logs everything to console
         console.log(newTrain.name);
         console.log(newTrain.dest);
         console.log(newTrain.time);
         console.log(newTrain.freq);
+
         // Clears all of the text-boxes
         $("#name-input").val("");
         $("#dest-input").val("");
@@ -201,7 +190,5 @@ $(document).on("submit", '#train-submit', function(event) {
         $("#freq-input").val("");       
     };
 });
-// // 3. Create Firebase event for adding train to the database and a row in the html when a user adds an entry
-
 
 setInterval(populateList, 60000);
