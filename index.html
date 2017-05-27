@@ -10,6 +10,7 @@
     <!-- Bootstrap -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
+    <link href="https://fonts.googleapis.com/css?family=Fredericka+the+Great" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
@@ -25,10 +26,10 @@
   <body>
 
     <!-- train Tracker -->
-    <div class="container" style="background-color: lightblue">
+    <div class="container">
 
       <!-- Jumbotron -->
-      <div class="jumbotron" style="background-color: lightgreen; color: gray">
+      <div class="jumbotron">
         <h1 class="text-center">train Schedule</h1>
         <h3 class="text-center">Don't you wish you had them in California?</h3>
       </div>
@@ -36,20 +37,26 @@
 <!-- Add user  -->
       <div>
         <form class="form-inline">
-          <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" class="form-control" id="email" placeholder="Me@somewhere.com">
+          <div class="form-group" id="auth">
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input type="email" class="form-control" id="email" placeholder="Me@somewhere.com">
+            </div>
+
+            <div class="form-group">
+              <label for="password">Password</label>
+              <input type="password" class="form-control" id="password" placeholder="*****">
+            </div>
+            <button type="button" id="btn-login" class="btn btn-primary">Log In</button>
+            <span>not signed up yet?</span>
+            <button type="button" id="btn-signup" class="btn btn-default">Sign Up</button>
           </div>
-          <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" class="form-control" id="password" placeholder="*****">
+          <div class="form-group" id="greeting">
+            <button type="button" id="btn-logout" class="btn btn-default">Log Out</button>
+            
           </div>
-          <button type="button" id="btn-login" class="btn btn-primary">Log In</button>
-          <span>not signed up yet?</span>
-          <button type="button" id="btn-signup" class="btn btn-default">Sign Up</button>
-          <button type="button" id="btn-logout" class="btn btn-default">Log Out</button>
-          <br><br>
         </form>
+        <br>
       </div>
 
 <!-- Add train  -->
@@ -61,29 +68,29 @@
               </h3>
             </div>
             <div id="collapse1" class="panel-collapse collapse">
-            <div class="panel-body">
-              <!-- Entry Form -->
-              <form id="train-submit">
-                <div class="form-group">
-                  <label for="name-input">Train Name</label>
-                  <input class="form-control" id="name-input" type="text">
-                </div>
-                <div class="form-group">
-                  <label for="dest-input">Destination</label>
-                  <input class="form-control" id="dest-input" type="text">
-                </div>
-                <div class="form-group">
-                  <label for="time-input">Train Departure Time (HH:mm - 24hr. format)</label>
-                  <input class="form-control" id="time-input" type="text">
-                </div>
-                <div class="form-group">
-                  <label for="freq-input">Frequency (in minutes)</label>
-                  <input class="form-control" id="freq-input" type="text">
-                </div>
-                <button class="btn btn-primary" id="add-train-btn" type="submit">Submit</button>
-              </form>
+              <div class="panel-body">
+                <!-- Entry Form -->
+                <form id="train-submit">
+                  <div class="form-group">
+                    <label for="name-input">Train Name</label>
+                    <input class="form-control" id="name-input" type="text">
+                  </div>
+                  <div class="form-group">
+                    <label for="dest-input">Destination</label>
+                    <input class="form-control" id="dest-input" type="text">
+                  </div>
+                  <div class="form-group">
+                    <label for="time-input">Train Departure Time (HH:mm - 24hr. format)</label>
+                    <input class="form-control" id="time-input" type="text">
+                  </div>
+                  <div class="form-group">
+                    <label for="freq-input">Frequency (in minutes)</label>
+                    <input class="form-control" id="freq-input" type="text">
+                  </div>
+                  <button class="btn btn-primary" id="add-train-btn" type="submit">Submit</button>
+                </form>
 
-            </div>
+              </div>
             </div>
 
           </div>

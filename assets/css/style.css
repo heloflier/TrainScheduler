@@ -1,3 +1,32 @@
-#btnLogOut {
-	visibility: hidden;
+* {
+	font-size: 18px;
+}
+
+#btn-logout {
+	display: none;
+}
+
+.jumbotron {
+	background-image: url(../images/train-19640_1280.jpg);
+	color: lightgray;
+	margin-top: 20px;
+}
+
+.jumbotron h1 {
+	font-family: 'Fredericka the Great', cursive;
+	font-size: 96px;
+	color: white;
+}
+
+.container {
+	 background-color: darkgrey;
+	 margin-top: 20px;
+	 opacity: .9;
+}
+
+body {
+	background-image: url(../images/japan-82123_1920.jpg);
+	background-position: center center;
+	background-size: cover;
+	background-attachment:fixed; 
 }

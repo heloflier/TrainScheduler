@@ -31,9 +31,54 @@ function compDates(startTime, freq) {
     return minArrival;
 };
 
+function showLogon() {
+    $('#auth').hide();
+    $('#greeting > span').empty();
+    $("#greeting").prepend("<span>Nice to see you again - now you don't have to see everyone else's trains </span>");
+    $('#btn-logout').show();
+};
 
+function showSignIn() {
+    $('#auth').show();
+    $('#greeting > span').empty();
+    $('#btn-logout').hide();
+};
 
-console.log('START');
+function populateList() {
+    // empty the table
+    $("#train-table > tbody").empty();
+    // event listener
+    database.ref().on("child_added", function(childSnapshot, prevChildKey) {
+        console.log(childSnapshot.val());
+        // Store everything into a variable.
+        var trainName = childSnapshot.val().name;
+        var trainDest = childSnapshot.val().dest;
+        var trainTime = (childSnapshot.val().time);
+        var trainFreq = parseInt(childSnapshot.val().freq);
+        var trainUser = (childSnapshot.val().user);
+        // train Info
+        console.log(trainName);
+        console.log(trainDest);
+        console.log(trainTime + typeof(trainTime));
+        console.log(trainFreq + typeof(trainFreq));
+        //   Calculate the frequency
+        var minArrival = compDates(trainTime, trainFreq);
+        console.log('minArrival ' + minArrival);
+        var arrivalTime = moment().add(minArrival, 'minutes').format('HH:mm');
+        // Add each train's data into the table
+        var loggedUser = firebase.auth().currentUser;
+        console.log('user = ' + loggedUser);
+        // console.log('userId = ' + loggedUser.uid);
+        console.log('trainUser = ' + trainUser);
+
+        if ((loggedUser == null) || (trainUser == loggedUser.uid)) {
+            $("#train-table > tbody").prepend("<tr><td>" + trainName + "</td><td>" + trainDest + "</td><td>" +
+                trainFreq + "</td><td>" + arrivalTime + "</td><td>" + minArrival + "</td>");
+        };
+    });
+};
+
+// populateList();
 
 // Authentication
 
@@ -46,12 +91,21 @@ $('#btn-login').on("click", function() {
     var auth = firebase.auth();
     
     console.log('auth ' + auth);
-//     // sign In
+    // sign In
     var promise = auth.signInWithEmailAndPassword(email, pass)
         .then(function(result) {
-
+            showLogon();
+            console.log('uid ' + auth.currentUser.uid);
         })
         .catch(function (error) {
+            var errorCode = error.code;
+            var errorMessage = error.message;
+            // check password
+            if (errorCode === 'auth/wrong-password') {
+                alert('Wrong password.');
+            } else {
+                alert(errorMessage);
+            }
             console.log(error);
         });
 });
@@ -65,14 +119,37 @@ $('#btn-signup').on("click", function() {
     var auth = firebase.auth();
     
     console.log('auth ' + auth);
-//     // sign In
-    var promise = auth.createUserWithEmailAndPassword(email, pass);
-    promise.catch(function (error) {
-        console.log(error);
+    console.log('uid ' + auth.currentUser.uid);
+    // create user
+    var promise = auth.createUserWithEmailAndPassword(email, pass)
+        .then(function(result) {
+            console.log('uid ' + auth.currentUser.uid);
+            showLogon();
+        })
+        .catch(function (error) {
+            console.log(error);
     });
 });
 
-populateList();
+$('#btn-logout').on("click", function() {
+    firebase.auth().signOut();
+    $('#email').val('');
+    $('#password').val('');
+});
+
+firebase.auth().onAuthStateChanged(function(user) {
+  if (user) {
+    // User is signed in.
+    showLogon();
+    populateList();
+  } 
+  else {
+    // No user is signed in.
+    showSignIn();
+    populateList();
+  }
+});
+
 // 2. Button for adding trains
 $(document).on("submit", '#train-submit', function(event) {
     event.preventDefault();
@@ -86,9 +163,11 @@ $(document).on("submit", '#train-submit', function(event) {
     var trainTime = $("#time-input").val().trim();
     console.log('time = ', trainTime);
     var trainTimemom = moment(trainTime, "HH:mm");
+    // save the user's id so we can match users to trains,
+    var trainUser = firebase.auth().currentUser.uid;
 
-    console.log('time = ', trainTimemom.format('HH:mm'));
-//     // validate input
+    console.log('time = ', trainTimemom.format('HH:mm', true));
+    // validate input
     if (trainName == "" || trainDest == '' || trainTime == "" || trainFreq == "") {
         alert('please fill out all fields with valid information')
     }
@@ -97,25 +176,25 @@ $(document).on("submit", '#train-submit', function(event) {
         alert('please fill out the time in hours and minutes - 24 hour format - (HH:mm)');
     }
     else {
-//     // Creates local "train schedule" object for holding train data
+        // Creates local "train schedule" object for holding train data
+        // save the user's profile into Firebase so we can list trains for a specific user
         var newTrain = {
             name: trainName,
             dest: trainDest,
             time: trainTime,
-            freq: trainFreq
+            freq: trainFreq,
+            user: trainUser
         };
-//         // Uploads train data to the database
+        // Uploads train data to the database
         database.ref().push(newTrain);
-//         // var x = Object.key();
-//         // database.ref(x).name = "pippo";
-//         // Logs everything to console
+        // var x = Object.key();
+        // database.ref(x).name = "pippo";
+        // Logs everything to console
         console.log(newTrain.name);
         console.log(newTrain.dest);
         console.log(newTrain.time);
         console.log(newTrain.freq);
-//         // Alert
-        alert("train successfully added");
-//         // Clears all of the text-boxes
+        // Clears all of the text-boxes
         $("#name-input").val("");
         $("#dest-input").val("");
         $("#time-input").val("");
@@ -123,48 +202,6 @@ $(document).on("submit", '#train-submit', function(event) {
     };
 });
 // // 3. Create Firebase event for adding train to the database and a row in the html when a user adds an entry
-function populateList() {
-    $("#train-table > tbody").empty();
-    database.ref().on("child_added", function(childSnapshot, prevChildKey) {
-    console.log(childSnapshot.val());
-    // Store everything into a variable.
-    var trainName = childSnapshot.val().name;
-    var trainDest = childSnapshot.val().dest;
-    var trainTime = (childSnapshot.val().time);
-    // var trainHour = parseInt(trainTime.slice(0, 2));
-    // var trainMin = parseInt(trainTime.slice(3));
-    var trainFreq = parseInt(childSnapshot.val().freq);
-//     // train Info
-    console.log(trainName);
-    console.log(trainDest);
-    console.log(trainTime + typeof(trainTime));
-    // console.log(trainHour + typeof(trainHour));
-    // console.log(trainMin + typeof(trainMin));
-    console.log(trainFreq + typeof(trainFreq));
-//     // Prettify the train time
-//     // var trainTime = moment.unix(trainTime).format("hh:mm");
-//     // // Calculate the months worked using hardcore math
-//     // // To calculate the months worked
-//     // var trainMonths = moment().diff(moment.unix(trainTime, "X"), "minutes");
-//     // console.log(trainMonths);
-//   Calculate the frequency
 
-
-    var minArrival = compDates(trainTime, trainFreq);
-    console.log('minArrival ' + minArrival);
-    var arrivalTime = moment().add(minArrival, 'minutes').format('HH:mm');
-    // Add each train's data into the table
-    $("#train-table > tbody").prepend("<tr><td>" + trainName + "</td><td>" + trainDest + "</td><td>" +
-        trainFreq + "</td><td>" + arrivalTime + "</td><td>" + minArrival + "</td>");
-    
-    });
-};
 
 setInterval(populateList, 60000);
-
-// Example Time Math
-// -----------------------------------------------------------------------------
-// Assume train time date of January 1, 2015
-// Assume current date is March 1, 2016
-// We know that this is 15 months.
-// Now we will create code in moment.js to confirm that any atttraint we use mets this test case
