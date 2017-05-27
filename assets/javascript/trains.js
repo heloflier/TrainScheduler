@@ -57,10 +57,10 @@ function populateList() {
         // Add each train's data into the table
         var loggedUser = firebase.auth().currentUser;
         console.log('user = ' + loggedUser);
-        // console.log('userId = ' + loggedUser.uid);
+
         console.log('trainUser = ' + trainUser);
         // adding a row in the html 
-        if ((loggedUser == null) || (trainUser == loggedUser.uid)) {
+        if ((loggedUser == null) || (loggedUser == "") || (trainUser == loggedUser.uid)) {
             $("#train-table > tbody").prepend("<tr><td>" + trainName + "</td><td>" + trainDest + "</td><td>" +
                 trainFreq + "</td><td>" + arrivalTime + "</td><td>" + minArrival + "</td>");
         };
@@ -106,11 +106,11 @@ $('#btn-signup').on("click", function() {
     var auth = firebase.auth();
     
     console.log('auth ' + auth);
-    console.log('uid ' + auth.currentUser.uid);
+
     // create user
     var promise = auth.createUserWithEmailAndPassword(email, pass)
         .then(function(result) {
-            console.log('uid ' + auth.currentUser.uid);
+
             showLogon();
         })
         .catch(function (error) {
@@ -153,7 +153,10 @@ $(document).on("submit", '#train-submit', function(event) {
     var trainTimemom = moment(trainTime, "HH:mm");
 
     // save the user's id so we can match users to trains,
-    var trainUser = firebase.auth().currentUser.uid;
+    var trainUser = "";
+    if (!firebase.auth().currentUser == null) {
+        var trainUser = firebase.auth().currentUser.uid;
+    };
 
     console.log('time = ', trainTimemom.format('HH:mm', true));
     // validate input
